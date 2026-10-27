@@ -410,6 +410,9 @@ function buildDraftTx(params: BuildSendTxParams): {
   if (!sendMax && !isAddressValid(params.changeAddress)) {
     throw new Error("invalid change address");
   }
+  if (!sendMax && !params.wallet.addresses.some((addr) => addressesEqual(addr.address, params.changeAddress))) {
+    throw new Error("change address is not controlled by this wallet");
+  }
 
   const account = accountKey(params.secret);
   if (account.kind === "address" && !sendMax) {

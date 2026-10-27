@@ -214,7 +214,7 @@ function BroadcastProgressBody() {
     if (b.peer) lines.push(b.peer);
     if (b.detail) lines.push(b.detail);
   } else if (b.phase === "success") {
-    lines.push("Broadcast succeeded");
+    lines.push("Transaction submitted · confirmation pending");
     if (b.peer) lines.push(b.peer);
     if (b.detail) lines.push(b.detail);
   } else if (b.phase === "error") {
