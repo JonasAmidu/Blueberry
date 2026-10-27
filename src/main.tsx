@@ -407,7 +407,7 @@ async function startApp(db: Database, secret: string): Promise<void> {
   setActiveBroadcastBus(bus);
 
   const wallet = createWallet(db, { secret });
-  setActiveSendContext(db, wallet);
+  setActiveSendContext(db, wallet, bus);
   setActivePaymentLabelContext(db);
   setActiveUtxoNamesContext(db, wallet, walletTxsStore);
 

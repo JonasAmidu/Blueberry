@@ -14,8 +14,10 @@ New wallet secrets are encrypted before they are saved. Read [SECURITY.md](SECUR
 ## TODO
 
 * [x] Require encryption before saving a new wallet secret
-* [ ] camera QR scan
-* [ ] Payment Codes (BIP47 + SP)
+* [x] Camera QR scan into the send form (optional local ZBar backend)
+* [x] BIP47 v1 payment codes: notifications, persistent channels, receiving and sending
+* [x] Silent Payments (BIP352) sending
+* [ ] Silent Payments receiving: chain scanning and recovery
 
 ## Features
 
@@ -27,6 +29,8 @@ New wallet secrets are encrypted before they are saved. Read [SECURITY.md](SECUR
 - **Watch-only ready** — `zpub` wallets can build unsigned PSBTs (including air-gapped anmated QR flow)
 - **Receive**
 - **Send** — set amount or send max; hot wallets sign in-app; watch-only export for external signing
+- **Camera QR scanning** — Ctrl+R in Send to scan a Bitcoin address or payment request locally
+- **Payment codes** — mnemonic wallets can receive and send BIP47 v1 payments; hot wallets can send Silent Payments
 - **Live sync dashboard** — peers, chain tip, filters, matching, blocks, balance, and transactions in one TUI
 - **Desktop cli** but has UI
 
@@ -46,6 +50,12 @@ Start your local Tor service before launching `dist/blueberry`. The default SOCK
 Choose **Create new wallet**, record the seed offline, and set a strong password of at least 12 characters. Existing wallets prompt for their password. BIP39 seeds with an additional passphrase are not supported; the disk-encryption password is a separate feature. Press `q` outside a text field to quit.
 
 ## Receive and send
+
+Press **Ctrl+R** in the send details form to start or cancel a local camera scan. Install a camera-capable `zbarcam` first; Linux/WSL needs an accessible camera device. Scans populate editable fields and still require transaction review. See [camera setup](docs/camera-qr.md) for platform support.
+
+For **BIP47**, press **P** in Receive to enable notification scanning and display your payment code. To pay another code for the first time, enter it in Send and press **Ctrl+N** to create a separate 546-sat notification transaction. Review and broadcast it, wait for confirmation, then create the payment with Enter. Notification outputs stay out of spendable balances. Back up the private wallet directory as well as the seed: outgoing channel indexes must survive restore and device changes. Read [BIP47 usage](docs/bip47-usage.md) and [supported protocol scope](docs/bip47.md).
+
+For **Silent Payments**, enter or scan a mainnet `sp1…` destination in the normal Send flow. The preview shows both the reusable destination and its derived `bc1p…` output. The complete selected input set is signed together; watch-only SP PSBT export is unsupported. **Receiving Silent Payments is not implemented** and no SP receive address is exposed. See [Silent Payments support](docs/silent-payments.md).
 
 With Tor running, let synchronization finish. Use left/right arrows on the dashboard to select **Receive** or **Send**, then press Enter.
 

@@ -14,13 +14,21 @@ This fork includes targeted wallet hardening reviewed on 2026-10-21. It is suita
 
 ## Validation
 
-The final local offline run passed **549 tests across 94 files**, with zero failures. Type checking and standalone compilation passed. Focused checks covered encryption before persistence, reopening/unlocking, wrong passwords, private file permissions, Tor failure/cancellation, and change-address validation.
+The wallet-hardening baseline passed **549 tests across 94 files**, with zero failures. The camera and payment-code update passed **687 unit and security tests across 106 files**, with zero failures; type checking and standalone compilation passed. New checks cover official BIP47/BIP352 vectors, notification and payment signatures, persisted channel indexes, incoming filter rematching, same-block discovery, reorganization guards, scanner cancellation and actual terminal interactions. Camera hardware capture and a live Tor handshake were unavailable in this session; the live test requires a listening Tor SOCKS proxy.
 
 A standalone terminal smoke test used a public BIP39 fixture in a temporary directory. It reached the encryption screen with an empty secrets table, persisted an encrypted envelope, opened the wallet dashboard, and displayed the expected receive address. No plaintext fixture seed was found in the active database or sidecars. The compiled executable also reached the unlock screen after restart.
 
 The live Tor test was reported passing by the operator outside the restricted test environment. It tests remote seed resolution and an encrypted Bitcoin peer handshake, not a payment. The operator's final `bun audit --json` output was `{}`. The installed package and lockfile were independently checked for `shell-quote` 1.11.0, and its quoting function rejected the advisory input without executing a shell command.
 
 No real funds were transferred. End-to-end payment acceptance, confirmation, recovery of a funded wallet, complete dependency review, and runtime network capture remain unverified.
+
+## Payment codes and camera input
+
+BIP47 support is limited to mnemonic wallets and the v1 protocol forms documented in [bip47.md](docs/bip47.md). Notification outputs are watched for discovery but excluded from spendable balances and coin selection. Outgoing indexes are reserved transactionally before a signed preview is released, including cancelled previews. Notification confirmation is checked against active header identity when building and broadcasting a payment. Incoming channels extend the watched scripts and trigger historical filter rematching and block reparsing. Channel metadata is public derivation data stored in the existing private database; it must be preserved to avoid outgoing address reuse after restore.
+
+Silent Payments supports sending with locally controlled eligible input keys. Inputs are fixed before ECDH output derivation, and externally mutable SP PSBT export is rejected. Receiving remains explicitly unimplemented. Official protocol vectors and disposable Alice/Bob transaction fixtures exercise derivation and signing; no real-funds payment has been tested.
+
+Camera access starts only after Ctrl+R in Send. An optional local `zbarcam` process has bounded output and duration, is cancelled when the form closes, and receives fixed argument arrays without a shell. Scanned data is validated before entering editable fields; it cannot directly trigger signing or broadcasting. Camera hardware capture was not available for local testing.
 
 ## Remaining boundaries
 
